@@ -6,6 +6,7 @@
 int countLines(FILE* infile);                                                   
 int containsInvalidCommand(char commandQueue[][128], int numCommands,
 	int* errorLine);
+void executeCode(char commandQueue[][128], int numCommands);
                                                                                 
 int main (int argc, char* argv[]) {                                             
     FILE* sourceCode;                                                           
@@ -38,10 +39,29 @@ int main (int argc, char* argv[]) {
     }                                                                           
                
 	int errorLine;  
-    if (containsInvalidCommand(commandQueue, numLines, &errorLine))	                                   
+    if (containsInvalidCommand(commandQueue, numLines, &errorLine)) {	                                   
 		printf("ERROR: Invalid instruction on line %d\n", errorLine);
-// Execute each command sequentially                                            
-}                                                                               
+		return 1;
+	}
+
+	// Execute code
+	executeCode(commandQueue, numLines);
+
+	return 0;
+}            
+
+void executeCode(char commandQueue[][128], int numCommands) {
+	int memoryStack[100]; // Stack only can go 100 deep
+	int stackSize = 0;
+	char* validCommandRegex[] = {"PUSH [1-9][0-9]*", "POP", "ADD", 
+		"IFEQ [1-9][0-9]*", "JUMP [1-9][0-9]*", "PRINT", "DUP"};
+
+	for (int i = 0; i < numCommands; i++) {
+		printf("%s", commandQueue[i]);	
+	}
+
+	return;
+}                                                                   
                                                                                 
 int countLines(FILE* infile) {                                                  
     int currentChar;                                                            
