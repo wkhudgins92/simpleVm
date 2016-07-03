@@ -1,8 +1,11 @@
 #include <stdio.h>                                                              
-#include <string.h>                                                             
+#include <string.h>             
+#include <regex.h>                                                
                                                                                 
 //#define LINE_MAX 128;                                                         
 int countLines(FILE* infile);                                                   
+int containsInvalidCommand(char commandQueue[][128], int numCommands,
+	int* errorLine);
                                                                                 
 int main (int argc, char* argv[]) {                                             
     FILE* sourceCode;                                                           
@@ -33,8 +36,10 @@ int main (int argc, char* argv[]) {
         commandQueue[i][strlen(commandQueue[i]) - 1] = '\0';                    
         i++;                                                                    
     }                                                                           
-                                                                                
-    if (containsInvalidCommand(commandQueue))                                   
+               
+	int errorLine;  
+    if (containsInvalidCommand(commandQueue, numLines, &errorLine))	                                   
+		printf("ERROR: Invalid instruction on line %d\n", errorLine);
 // Execute each command sequentially                                            
 }                                                                               
                                                                                 
@@ -48,3 +53,32 @@ int countLines(FILE* infile) {
             lineCount++;                                                        
     return lineCount;                                                           
 }              
+
+int containsInvalidCommand(char commandQueue[][128], int numCommands, 
+	int* errorLine) {
+	int reti;
+	int flag;
+	int i;
+	regex_t regex[7];
+	char* validCommandRegex[] = {"PUSH [1-9][0-9]*", "POP", "ADD", 
+		"IFEQ [1-9][0-9]*", "JUMP [1-9][0-9]*", "PRINT", "DUP"};
+
+	for (i = 0; i < 7; i++)
+		reti = regcomp(&regex[i], validCommandRegex[i], 0);
+
+	for (i = 0; i < numCommands; i++) {
+		flag = 0;
+		for (int j = 0; !flag && j < 7; j++) {
+			reti = regexec(&regex[j], commandQueue[i], 0, NULL, 0);
+			if (!reti) 
+				flag = 1;
+		}
+
+		if (!flag) {
+			*errorLine = i + 1;
+			return 1;
+		}
+	}
+
+	return 0;
+} 
