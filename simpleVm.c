@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>                                                              
 #include <string.h>             
 #include <regex.h>                                                
@@ -53,11 +54,72 @@ int main (int argc, char* argv[]) {
 void executeCode(char commandQueue[][128], int numCommands) {
 	int memoryStack[100]; // Stack only can go 100 deep
 	int stackSize = 0;
+	int i;
+	int j;
+	int reti;
+	int temp;
+	regex_t regex[7];
 	char* validCommandRegex[] = {"PUSH [1-9][0-9]*", "POP", "ADD", 
 		"IFEQ [1-9][0-9]*", "JUMP [1-9][0-9]*", "PRINT", "DUP"};
 
-	for (int i = 0; i < numCommands; i++) {
-		printf("%s", commandQueue[i]);	
+	for (i = 0; i < 7; i++)
+		reti = regcomp(&regex[i], validCommandRegex[i], 0);
+
+	for (i = 0; i < numCommands; i++) 
+		for (j = 0; j < 7; j++) {
+			reti = regexec(&regex[j], commandQueue[i], 0, NULL, 0);
+			if (!reti) {
+				switch (j) {
+					case 0: // PUSH
+						if (stackSize >= 99) {
+							printf("Fatal error: Can't push to full stack.\n");
+							exit(1);
+						}
+
+						strtok(commandQueue[i], " ");
+						temp = atoi(commandQueue[i][1]);
+						memoryStack[stackSize] = temp;
+						stackSize++;
+						break;
+					case 1: // POP
+						if (stackSize < 1) {
+							printf("Fatal error: Cannot pop from empty stack.\n");
+							exit(1);
+						}
+
+						stackSize--;
+						break;
+					case 2: // ADD
+						if (stackSize < 2) {
+							printf("Fatal error: Missing one operand.\n");
+							exit(1);
+						}
+
+						temp = memoryStack[stackSize - 1] + memoryStack[stackSize - 2];
+						stackSize--;
+						memoryStack[stackSize - 1] = temp;
+						break;
+					case 3: // IFEQ
+						if (memoryStack[stackSize - 1] == 0) {
+							strtok(commandQueue[i], " ");
+							temp = atoi(commandQueue[i][1]);
+							i = temp - 2;
+						}		
+						break;
+					case 4: // JUMP
+						strtok(commandQueue[i], " ");
+						temp = atoi(commandQueue[i][1]);
+						i = temp - 2;
+						break; 
+					case 5: // PRINT
+						printf("%d/n", memoryStack[stackSize - 1]);
+						break;
+					case 6: // DUP
+						stackSize++;
+						memoryStack[stackSize - 1] = memoryStack[stackSize - 2];
+						break;
+			}
+		}	
 	}
 
 	return;
