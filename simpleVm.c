@@ -58,6 +58,7 @@ void executeCode(char commandQueue[][128], int numCommands) {
 	int j;
 	int reti;
 	int temp;
+	char* tempString = malloc(sizeof(char) * 128); 
 	regex_t regex[7];
 	char* validCommandRegex[] = {"PUSH [1-9][0-9]*", "POP", "ADD", 
 		"IFEQ [1-9][0-9]*", "JUMP [1-9][0-9]*", "PRINT", "DUP"};
@@ -76,8 +77,11 @@ void executeCode(char commandQueue[][128], int numCommands) {
 							exit(1);
 						}
 
-						strtok(commandQueue[i], " ");
-						temp = atoi(commandQueue[i][1]);
+						tempString = strcpy(tempString, commandQueue[i]);
+						strtok(tempString, " ");
+						tempString = strtok(NULL, " ");
+
+						temp = atoi(tempString);
 						memoryStack[stackSize] = temp;
 						stackSize++;
 						break;
@@ -101,18 +105,22 @@ void executeCode(char commandQueue[][128], int numCommands) {
 						break;
 					case 3: // IFEQ
 						if (memoryStack[stackSize - 1] == 0) {
-							strtok(commandQueue[i], " ");
-							temp = atoi(commandQueue[i][1]);
+							tempString = strcpy(tempString, commandQueue[i]);
+							strtok(tempString, " ");
+							tempString = strtok(NULL, " ");
+							temp = atoi(tempString);
 							i = temp - 2;
 						}		
 						break;
 					case 4: // JUMP
-						strtok(commandQueue[i], " ");
-						temp = atoi(commandQueue[i][1]);
+						tempString = strcpy(tempString, commandQueue[i]);
+						strtok(tempString, " ");
+						tempString = strtok(NULL, " ");
+						temp = atoi(tempString);
 						i = temp - 2;
 						break; 
 					case 5: // PRINT
-						printf("%d/n", memoryStack[stackSize - 1]);
+						printf("%d\n", memoryStack[stackSize - 1]);
 						break;
 					case 6: // DUP
 						stackSize++;
