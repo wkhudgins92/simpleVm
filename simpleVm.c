@@ -78,7 +78,7 @@ void executeCode(char commandQueue[][LINE_MAX], int numCommands) {
 	int stackSize = 0;
 	int memoryStack[STACK_SIZE]; // Stack only can go 100 deep
 	regex_t regex[INSTRUCTION_SET_SIZE];
-	char* validCommandRegex[] = {"PUSH [1-9][0-9]*", "POP", "ADD", 
+	char* validCommandRegex[] = {"PUSH [1-9][0-9]*", "POP", "SUM", 
 		"IFEQ [1-9][0-9]*", "JUMP [1-9][0-9]*", "PRINT", "DUP"};
 	char* tempString = malloc(sizeof(char) * LINE_MAX); 
 
@@ -114,7 +114,7 @@ void executeCode(char commandQueue[][LINE_MAX], int numCommands) {
 
 						stackSize--;
 						break;
-					case 2: // ADD: Adds top two items on the stack together, 
+					case 2: // SUM: Adds top two items on the stack together, 
 							// removes thsoe values, and places new value on 
 							// top of stack
 						if (stackSize < 2) {
@@ -187,7 +187,7 @@ int countLines(FILE* infile) {
 int containsInvalidCommand(char commandQueue[][LINE_MAX], int numCommands, 
 	int* errorLine) {
 	int i, flag, reti;
-	char* validCommandRegex[] = {"PUSH [1-9][0-9]*", "POP", "ADD", 
+	char* validCommandRegex[] = {"PUSH [1-9][0-9]*", "POP", "SUM", 
 		"IFEQ [1-9][0-9]*", "JUMP [1-9][0-9]*", "PRINT", "DUP"};
 	regex_t regex[INSTRUCTION_SET_SIZE];
 
